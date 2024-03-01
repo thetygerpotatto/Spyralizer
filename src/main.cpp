@@ -11,7 +11,7 @@ int main() {
     Vector2 offset = {screen_widht/2.0, screen_height/2.0};
 
     float tita = 0.0f;
-    float tita2 = 0.0f;
+    float tita2 = 3*PI/2.0f;
     float norm = 100.0f;
     float norm2 = 200.0f;
 
@@ -31,10 +31,10 @@ int main() {
 
     while (!WindowShouldClose()) {
 
-        CompPoint = {norm*sinf(tita), norm*cosf(tita)};
-        SeccondCompPoint = {CompPoint.x + norm2*sinf(tita2), CompPoint.y + norm2*cosf(tita2)};
+        CompPoint = {norm*cosf(tita), norm*sinf(tita)};
+        SeccondCompPoint = {CompPoint.x + norm2*cosf(tita2), CompPoint.y + norm2*sinf(tita2)};
 
-        tita += PI/180.0f;
+        tita += PI/64.0f;
         tita2 -= PI/180.0f;
         
         
