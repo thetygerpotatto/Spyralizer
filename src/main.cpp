@@ -1,5 +1,3 @@
-#include <cmath>
-#include <complex>
 #include <cstddef>
 #include <iostream>
 #include <raylib.h>
@@ -26,7 +24,7 @@ int main() {
     pendulum pen2(pen, 270.0f, 77.0f);
 
     pen.SetRotationRate(PI/64);
-    pen2.SetRotationRate(-PI/128);
+    pen2.SetRotationRate(-PI/127);
 
     penvec.push_back(pen);
     penvec.push_back(pen2);
@@ -42,8 +40,11 @@ int main() {
         BeginMode2D(camera);
         ClearBackground({BLACK});
         for (size_t i = 0; i < penvec.size(); ++i) {
-            DrawLineV(*penvec[i].base, *penvec[i].head, {0x4E, 0xD9, 0xB5, 0xFF});
+            //DrawLineV(*penvec[i].base, *penvec[i].head, {0x4E, 0xD9, 0xB5, 0xFF});
+            //std::cout << "Pendulo #" << i << "(" << penvec[i].base->x << ", " << penvec[i].base->y << ")" << " (" << penvec[i].head->x << ", " << penvec[i].head->y << ")\n";
         }
+        DrawCircleV(*penvec[penvec.size()-1].head, 10.0f, {0xff, 0xff, 0xff, 0xff});
+        //DrawPixelV(*penvec[penvec.size()-1].head, {0xff, 0xff, 0xff, 0xff});
         EndMode2D();
         EndDrawing();
     }

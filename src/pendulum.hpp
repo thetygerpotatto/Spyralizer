@@ -10,7 +10,6 @@ class pendulum {
     float angle = 0.0f;
     float magnitude = 0.0f;
     float rotation_rate = 0.0f;
-    pendulum* father = nullptr;
 
 public:
     Vector2 *base;
@@ -25,24 +24,20 @@ public:
         angle = p.get_angle();
         magnitude = p.get_magnitude();
         rotation_rate = p.get_rotation_rate();
-        father = p.get_father();
         
-        if(is_origin) {
-            base = new Vector2;
-            *base = *p.base;
-        } else {
-            base = father->head;
-        }
+        base = new Vector2;
+        *base = *p.base;
         head = new Vector2;
         *head = *p.head;
     }
 
     pendulum(pendulum &fa, float x, float y) {
-        father = &fa;  
-        base = father->head;
+        base = new Vector2;
+        *base = *fa.head;
         head = new Vector2;
         head->x = x;
         head->y =y;
+        is_origin = false;
         magnitude = sqrtf(powf(head->x - base->x, 2)+ powf(head->y - base->y, 2));
         angle = asinf((head->x - base->x) / magnitude);
     }
@@ -93,23 +88,14 @@ public:
         return rotation_rate;
     }
 
-    pendulum* get_father() {
-        return father;
-    }
-
     pendulum& operator=(pendulum p) {
         is_origin = p.get_origin_status();
         angle = p.get_angle();
         magnitude = p.get_magnitude();
         rotation_rate = p.get_rotation_rate();
-        father = p.get_father();
         
-        if(is_origin) {
-            base = new Vector2;
-            *base = *p.base;
-        } else {
-            base = father->head;
-        }
+        base = new Vector2;
+        *base = *p.base;
         head = new Vector2;
         *head = *p.head;
         return *this;

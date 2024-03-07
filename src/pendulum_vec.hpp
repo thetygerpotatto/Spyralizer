@@ -14,8 +14,12 @@ class pendulum_vec {
     
 public:
     pendulum_vec() {
-    pen_count = 0;
+        pen_count = 0;
         capacity = 0;
+    }
+
+    ~pendulum_vec() {
+        free(pens);
     }
 
     pendulum& operator[](size_t i) {
@@ -29,8 +33,12 @@ public:
     void push_back(pendulum& p) {
         increase_size();
         last_pen_idx = pen_count++;
-        pens[last_pen_idx] = pendulum(p);
-    }
+        pens[last_pen_idx] = p;
+
+        if (last_pen_idx != 0) {
+            pens[last_pen_idx].base = pens[last_pen_idx-1].head;
+        }
+    } 
 
     void rotate_pens() {
         for (size_t i = 0; i < size(); ++i) {
