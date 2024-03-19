@@ -5,6 +5,7 @@
 #include "pendulum_vec.hpp"
 #include "pendulum.hpp"
 #include "input_box.hpp"
+#include "text_camp.hpp"
 #include <vector>
 
 using std::vector;
@@ -97,7 +98,25 @@ int main() {
                 DrawRectangleLinesEx(input_boxes[i].angle_box, 5, GRAY);
             }            
         }
+        
+        int key = GetKeyPressed();
+            
+        for (size_t i = 0; i < input_boxes.size(); ++i) {
 
+            text_camp* camp = nullptr;
+
+            if (input_boxes[i].in_mag_box) {
+                camp = &input_boxes[i].mag;
+            }
+
+            if (input_boxes[i].in_angle_box) {
+                camp = &input_boxes[i].angle;
+            }
+
+            while (key && camp) {
+                camp->text[camp->char_count++] = key;
+            }
+        }
 
         BeginMode2D(camera);
         // Draw UI
