@@ -10,12 +10,15 @@ class text_camp {
     
 public:
 
-    size_t char_count = 0;
+    int char_count = 0;
     char* text;
 
     text_camp(const int size) {
         text = new char[size+1];
         text[size] = '\0';
+        for (size_t i = 0; i < size ; ++i) {
+            text[i] = '\0';
+        }
     }
 
     ~text_camp() {

@@ -1,3 +1,4 @@
+#include <cmath>
 #include <cstddef>
 #include <iostream>
 #include <raylib.h>
@@ -31,12 +32,16 @@ int main() {
     Rectangle side_bar = {(screen_widht/4.0f)*3.0f,0,(screen_widht/4.0f),screen_height};
 
     input_box box1(side_bar);
+    box1.mag.text[0] = '1';
+    box1.mag.text[1] = '0';
+    box1.mag.text[2] = '0';
+    box1.angle.text[0] = '1';
     input_boxes.push_back(box1);
 
     pendulum_vec penvec;
 
-    pendulum pen(origin, (Vector2){100, -100});
-    pendulum pen2(pen, 270.0f, 77.0f);
+    pendulum pen(origin, (Vector2){100, 0});
+    pendulum pen2(origin, (Vector2){0,100});
     pendulum pen3((Vector2){0.0}, (Vector2){0,100});
 
     bool input_mode = false;
@@ -45,10 +50,13 @@ int main() {
     pen2.SetRotationRate(-PI/32);
     pen3.SetRotationRate(PI/16);
 
-    penvec.push_back(pen);
-    penvec.push_back(pen2);
-    penvec.push_back(pen3);
- 
+    for(size_t i = 0; i < input_boxes.size(); ++i) {
+        float m = input_boxes[i].get_mag();
+        float a = (input_boxes[i].get_angle())*PI/180.0f;
+        pendulum p = pendulum(origin, (Vector2){cosf(a)*m, sinf(a)*m});
+        p.SetRotationRate(PI/180.0f);
+        penvec.push_back(p);
+    }
 
     InitWindow(screen_widht, screen_height, "Spyralizer");
     SetTargetFPS(60); 
@@ -75,31 +83,7 @@ int main() {
             }
         }
 
-        
-        // DRAWING
-        BeginDrawing();
-        ClearBackground({0x39,0x3a,0x41,0xff});
-        // drawing side bar
-        DrawRectangleRec(side_bar, {0x54,0x18,0x93, 0xAA});
-        DrawRectangleRec(adding_box, {0xf0,0xf4,0xff, 0xAA});
-
-        for (size_t i = 0; i < input_boxes.size(); ++i) {
-            DrawRectangleRec(input_boxes[i].i_box, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].mag_box, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].angle_box, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].angle_sym, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].mag_sym, {0xf0,0xf4,0xff, 0xAA});
-
-            if(input_boxes[i].in_mag_box) {
-                DrawRectangleLinesEx(input_boxes[i].mag_box, 5, GRAY);
-            }
-
-            if(input_boxes[i].in_angle_box) {
-                DrawRectangleLinesEx(input_boxes[i].angle_box, 5, GRAY);
-            }            
-        }
-        
-        int key = GetKeyPressed();
+        int key = GetCharPressed();
             
         for (size_t i = 0; i < input_boxes.size(); ++i) {
 
@@ -113,10 +97,45 @@ int main() {
                 camp = &input_boxes[i].angle;
             }
 
-            while (key && camp) {
-                camp->text[camp->char_count++] = key;
+            while (key > 0) {
+                if (key >= 48 && key <= 57 && camp->char_count <= 10) {
+                    camp->text[camp->char_count++] = key;
+                    camp->text[camp->char_count + 1] = '\0';
+                }
+
+
+                key = GetCharPressed();
+            }
+            if (IsKeyPressed(KEY_BACKSPACE) || IsKeyDown(KEY_BACKSPACE)) {
+                if (camp->char_count < 0) camp->char_count = 0;
+                else camp->text[camp->char_count--] = '\0';
             }
         }
+        // DRAWING
+        BeginDrawing();
+        ClearBackground({0x39,0x3a,0x41,0xff});
+        // drawing side bar
+        DrawRectangleRec(side_bar, {0x54,0x18,0x93, 0xAA});
+        DrawRectangleRec(adding_box, {0xf0,0xf4,0xff, 0xAA});
+
+        for (size_t i = 0; i < input_boxes.size(); ++i) {
+            DrawRectangleRec(input_boxes[i].i_box, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(input_boxes[i].mag_box, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(input_boxes[i].angle_box, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(input_boxes[i].angle_sym, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(input_boxes[i].mag_sym, {0xf0,0xf4,0xff, 0xAA});
+            DrawText(input_boxes[i].mag.text, input_boxes[i].mag_box.x, input_boxes[i].mag_box.y, 28, GRAY);
+            DrawText(input_boxes[i].angle.text, input_boxes[i].angle_box.x + 5.0f, input_boxes[i].angle_box.y + 5.0f , 28, GRAY);
+
+            if(input_boxes[i].in_mag_box) {
+                DrawRectangleLinesEx(input_boxes[i].mag_box, 5, GRAY);
+            }
+
+            if(input_boxes[i].in_angle_box) {
+                DrawRectangleLinesEx(input_boxes[i].angle_box, 5, GRAY);
+            }            
+        }
+        
 
         BeginMode2D(camera);
         // Draw UI
