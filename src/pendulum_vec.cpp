@@ -7,7 +7,7 @@ pendulum_vec::pendulum_vec() {
 }
 
 pendulum_vec::~pendulum_vec() {
-    free(pens);
+    delete [] pens;
 }
 
  pendulum& pendulum_vec::operator[](size_t i) {
@@ -47,7 +47,7 @@ void pendulum_vec::rotate_pens() {
 void pendulum_vec::increase_size() {
     if (capacity == 0) {
         capacity += 5;
-        pens = static_cast<pendulum*>(malloc(sizeof(pendulum)*capacity));
+        pens = new pendulum[capacity];
     }
     if (pen_count + 1 == capacity && capacity != 0) {
         capacity += 5;

@@ -13,8 +13,8 @@ struct input_box {
     Rectangle father;
     static size_t box_num;
     
-    text_camp mag = text_camp(MAX_INPUT_CHARS);
-    text_camp angle = text_camp(MAX_INPUT_CHARS);
+    text_camp mag_camp = text_camp(MAX_INPUT_CHARS);
+    text_camp angle_camp = text_camp(MAX_INPUT_CHARS);
         
     bool in_mag_box = false;
     bool in_angle_box = false;
@@ -37,13 +37,43 @@ struct input_box {
         ++box_num; 
     }
 
+    input_box(const input_box & ib) {
+        father = ib.father;
+        i_box = ib.i_box;
+        mag_box = ib.mag_box;
+        angle_box = ib.angle_box;
+        angle_sym = ib.angle_sym;
+        mag_sym = ib.mag_sym;
+        mag_camp = text_camp(ib.mag_camp);
+        angle_camp = text_camp(ib.angle_camp);
+    }
+    
+    input_box & operator=(const input_box& ib) {
+        father = ib.father;
+        i_box = ib.i_box;
+        mag_box = ib.mag_box;
+        angle_box = ib.angle_box;
+        angle_sym = ib.angle_sym;
+        mag_sym = ib.mag_sym;
+        mag_camp = ib.mag_camp;
+        angle_camp = ib.angle_camp;
+        return *this;
+    }
 
     float get_mag() {
-        return std::stof(mag.text);
+        if (*mag_camp.text == '\0') {
+            return 0;
+        } else {
+            return std::stof(mag_camp.text);
+        }
     }
     
     float get_angle() {
-        return std::stof(angle.text);
+        if (*angle_camp.text == '\0') {
+            return 0;
+        } else {
+            return std::stof(angle_camp.text);
+        }
     }
 
     

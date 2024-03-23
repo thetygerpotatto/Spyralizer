@@ -2,14 +2,16 @@
 #include <cstddef>
 #include <iostream>
 #include <raylib.h>
-#include <raymath.h>
 #include "pendulum_vec.hpp"
 #include "pendulum.hpp"
 #include "input_box.hpp"
 #include "text_camp.hpp"
+#include <stdlib.h>
 #include <vector>
 
 using std::vector;
+
+void update_penvec(pendulum_vec& penvec, vector<input_box> &boxes);
 
 int main() {
     const int screen_widht = 1080;
@@ -25,30 +27,23 @@ int main() {
     camera.zoom = 0.7f; 
     camera.rotation = 0.0f;
     
-    size_t panning = 5;
+    const size_t panning = 5;
 
 
     Rectangle adding_box = {screen_widht/4.0f*3.0f-(screen_widht/16.0f) - panning, (float)panning, screen_widht/16.0f, screen_widht/16.0f};
     Rectangle side_bar = {(screen_widht/4.0f)*3.0f,0,(screen_widht/4.0f),screen_height};
 
     input_box box1(side_bar);
-    box1.mag.text[0] = '1';
-    box1.mag.text[1] = '0';
-    box1.mag.text[2] = '0';
-    box1.angle.text[0] = '1';
+
     input_boxes.push_back(box1);
 
     pendulum_vec penvec;
 
     pendulum pen(origin, (Vector2){100, 0});
-    pendulum pen2(origin, (Vector2){0,100});
-    pendulum pen3((Vector2){0.0}, (Vector2){0,100});
 
     bool input_mode = false;
 
     pen.SetRotationRate(PI/64);
-    pen2.SetRotationRate(-PI/32);
-    pen3.SetRotationRate(PI/16);
 
     for(size_t i = 0; i < input_boxes.size(); ++i) {
         float m = input_boxes[i].get_mag();
@@ -61,11 +56,17 @@ int main() {
     InitWindow(screen_widht, screen_height, "Spyralizer");
     SetTargetFPS(60); 
 
-    while (!WindowShouldClose()) {
+    while (!WindowShouldClose()) { 
+
         penvec.rotate_pens();
         
         
         Vector2 mouse_cords = GetMousePosition();
+        
+        if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_cords, adding_box)) {
+            input_box bbb(side_bar);
+            input_boxes.push_back(bbb);
+        }
         
         for (input_box& box : input_boxes) {
             if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(mouse_cords, box.mag_box)) {
@@ -85,32 +86,34 @@ int main() {
 
         int key = GetCharPressed();
             
-        for (size_t i = 0; i < input_boxes.size(); ++i) {
+        for (input_box& box: input_boxes) {
 
-            text_camp* camp = nullptr;
+            text_camp* camp = 0;
 
-            if (input_boxes[i].in_mag_box) {
-                camp = &input_boxes[i].mag;
+            if (box.in_mag_box) {
+                camp = &box.mag_camp;
+                update_penvec(penvec, input_boxes);
             }
 
-            if (input_boxes[i].in_angle_box) {
-                camp = &input_boxes[i].angle;
+            if (box.in_angle_box) {
+                camp = &box.angle_camp;
+                update_penvec(penvec, input_boxes);
             }
 
-            while (key > 0) {
+            while (key > 0 && camp) {
                 if (key >= 48 && key <= 57 && camp->char_count <= 10) {
                     camp->text[camp->char_count++] = key;
                     camp->text[camp->char_count + 1] = '\0';
                 }
-
-
                 key = GetCharPressed();
             }
-            if (IsKeyPressed(KEY_BACKSPACE) || IsKeyDown(KEY_BACKSPACE)) {
+
+            if (IsKeyPressed(KEY_BACKSPACE) && camp) {
                 if (camp->char_count < 0) camp->char_count = 0;
-                else camp->text[camp->char_count--] = '\0';
+                else camp->text[--camp->char_count] = '\0';
             }
         }
+
         // DRAWING
         BeginDrawing();
         ClearBackground({0x39,0x3a,0x41,0xff});
@@ -118,21 +121,21 @@ int main() {
         DrawRectangleRec(side_bar, {0x54,0x18,0x93, 0xAA});
         DrawRectangleRec(adding_box, {0xf0,0xf4,0xff, 0xAA});
 
-        for (size_t i = 0; i < input_boxes.size(); ++i) {
-            DrawRectangleRec(input_boxes[i].i_box, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].mag_box, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].angle_box, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].angle_sym, {0xf0,0xf4,0xff, 0xAA});
-            DrawRectangleRec(input_boxes[i].mag_sym, {0xf0,0xf4,0xff, 0xAA});
-            DrawText(input_boxes[i].mag.text, input_boxes[i].mag_box.x, input_boxes[i].mag_box.y, 28, GRAY);
-            DrawText(input_boxes[i].angle.text, input_boxes[i].angle_box.x + 5.0f, input_boxes[i].angle_box.y + 5.0f , 28, GRAY);
+        for (input_box& box : input_boxes) {
+            DrawRectangleRec(box.i_box, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(box.mag_box, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(box.angle_box, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(box.angle_sym, {0xf0,0xf4,0xff, 0xAA});
+            DrawRectangleRec(box.mag_sym, {0xf0,0xf4,0xff, 0xAA});
+            DrawText(box.mag_camp.text, box.mag_box.x + 8.0f, box.mag_box.y + 5.0f, 28, GRAY);
+            DrawText(box.angle_camp.text, box.angle_box.x + 8.0f, box.angle_box.y + 5.0f, 28, GRAY);
 
-            if(input_boxes[i].in_mag_box) {
-                DrawRectangleLinesEx(input_boxes[i].mag_box, 5, GRAY);
+            if(box.in_mag_box) {
+                DrawRectangleLinesEx(box.mag_box, 5, GRAY);
             }
 
-            if(input_boxes[i].in_angle_box) {
-                DrawRectangleLinesEx(input_boxes[i].angle_box, 5, GRAY);
+            if(box.in_angle_box) {
+                DrawRectangleLinesEx(box.angle_box, 5, GRAY);
             }            
         }
         
@@ -150,3 +153,25 @@ int main() {
         EndDrawing();
     }
 }
+
+void update_penvec(pendulum_vec& penvec, vector<input_box> &boxes){
+    if(boxes.size() > penvec.size()) {
+        for (size_t i = penvec.size(); i < boxes.size(); ++i) {
+            float m = boxes[i].get_mag();
+            float a = (boxes[i].get_angle())*PI/180.0f;
+            pendulum p = pendulum((Vector2){cosf(a)*m, sinf(a)*m});
+            p.SetRotationRate((PI/180.0f)*(float)(rand() % 10));
+            penvec.push_back(p);
+        }
+    } 
+    
+    for (size_t i = 0; i < penvec.size(); ++i) {
+        float m = boxes[i].get_mag();
+        float a = boxes[i].get_angle();
+        
+        penvec[i].set_angle(a);
+        penvec[i].set_magnitude(m);
+        penvec[i].SetRotationRate(PI/180.0f*(float)(rand() % 10));
+    }
+}
+

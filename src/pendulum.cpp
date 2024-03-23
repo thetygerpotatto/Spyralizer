@@ -1,4 +1,5 @@
 #include "pendulum.hpp"
+#include <raylib.h>
 
 pendulum::pendulum(pendulum &p) {
     is_origin = p.get_origin_status();
@@ -34,10 +35,36 @@ pendulum::pendulum(Vector2 b, Vector2 h) {
     angle = acosf((h.x - b.x) / magnitude);
 }
 
+pendulum::pendulum(Vector2 h) {
+    head = new Vector2;
+    *head = h;
+    is_origin = false;
+
+    magnitude = sqrtf(powf((h.x),2) + powf((h.y), 2));
+    angle = acosf((h.x) / magnitude);
+}
+
+pendulum::pendulum(Vector2 h, bool origin) {
+    base = new Vector2;
+    *base = {0};
+    head = new Vector2;
+    *head = h;
+    is_origin = false;
+
+    magnitude = sqrtf(powf((h.x),2) + powf((h.y), 2));
+    angle = acosf((h.x) / magnitude);
+}
+
 pendulum::~pendulum(){
-    delete head;
+    if (head) {
+        delete head;
+        head = nullptr;
+    }
     if(is_origin) {
-        delete base;
+        if (base) {
+            delete base;
+            base = nullptr;
+        }
     }
 }
 
@@ -45,7 +72,13 @@ void pendulum::SetRotationRate(float r) {
     rotation_rate = r;
 }
 
+void pendulum::set_magnitude(float m) {
+    magnitude = m;
+}
 
+void pendulum::set_angle(float a) {
+    angle = a;
+}
 
 void pendulum::Rotate() {
     angle += rotation_rate;

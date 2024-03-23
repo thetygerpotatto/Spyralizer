@@ -25,13 +25,23 @@ public:
 
     pendulum(Vector2 b, Vector2 h);
 
+    pendulum(Vector2 h, bool origin);
+
+    pendulum(Vector2 h);
+
     ~pendulum();
 
     void SetRotationRate(float r);
 
+    void set_magnitude(float m);
+
+    void set_angle(float a);
+
     void Rotate();
 
     const bool get_origin_status();
+
+    void set_origin_status(bool origin);
 
     float get_angle();
 
