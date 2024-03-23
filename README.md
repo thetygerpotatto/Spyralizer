@@ -1,1 +1,1 @@
-# Little program to make pendulums without gravity and make preety figures.
+# Little program to make pendulums without gravity and that make preety figures.
