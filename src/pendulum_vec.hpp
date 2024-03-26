@@ -23,6 +23,8 @@ public:
     void push_back(pendulum& p);
 
     void push_back(pendulum&& p);
+    
+    void pop_back();
 
     void rotate_pens();
 private:

@@ -5,15 +5,16 @@
 #include <cstring>
 #include <iostream>
 
+#define TEXT_CAMP_SIZE 10
+
 class text_camp {
     
 public:
-    size_t size;
+    const size_t size = TEXT_CAMP_SIZE;
     int char_count = 0;
     char* text;
 
-    text_camp(const int size) {
-        this->size = size;
+    text_camp() {
         text = new char[size+1];
         text[size] = '\0';
         for (size_t i = 0; i < size ; ++i) {
@@ -23,7 +24,6 @@ public:
     }
 
     text_camp(const text_camp& tc) {
-        size = tc.size; char_count = tc.char_count;
         text = new char[size+1];
         *text = {0};
         text[size] = '\0';
@@ -31,7 +31,6 @@ public:
     }
 
     text_camp& operator=(const text_camp& tc) {
-        size = tc.size; char_count = tc.char_count;
         text = new char[size+1];
         *text = {0};
         text[size] = '\0';

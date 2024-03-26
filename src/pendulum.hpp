@@ -50,6 +50,7 @@ public:
     float get_rotation_rate();
 
     pendulum& operator=(pendulum p); 
+    pendulum& operator=(int z); 
 };
 
 

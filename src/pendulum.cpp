@@ -7,8 +7,11 @@ pendulum::pendulum(pendulum &p) {
     magnitude = p.get_magnitude();
     rotation_rate = p.get_rotation_rate();
     
-    base = new Vector2;
-    *base = *p.base;
+    if(p.base) {
+        base = new Vector2;
+        *base = *p.base;
+    }
+
     head = new Vector2;
     *head = *p.head;
 }
@@ -38,10 +41,11 @@ pendulum::pendulum(Vector2 b, Vector2 h) {
 pendulum::pendulum(Vector2 h) {
     head = new Vector2;
     *head = h;
+    base = nullptr;
     is_origin = false;
 
     magnitude = sqrtf(powf((h.x),2) + powf((h.y), 2));
-    angle = acosf((h.x) / magnitude);
+    angle = acosf((h.y) / h.x);
 }
 
 pendulum::pendulum(Vector2 h, bool origin) {
@@ -108,9 +112,24 @@ pendulum& pendulum::operator=(pendulum p) {
     magnitude = p.get_magnitude();
     rotation_rate = p.get_rotation_rate();
     
-    base = new Vector2;
-    *base = *p.base;
+    if (p.base) {
+        base = new Vector2;
+        *base = *p.base;
+    }
+
     head = new Vector2;
     *head = *p.head;
+    return *this;
+}
+
+pendulum& pendulum::operator=(int z) {
+    is_origin = 0;
+    angle = 0;
+    magnitude = 0;
+    rotation_rate = 0;
+    
+    base = nullptr;
+
+    head = nullptr;
     return *this;
 }

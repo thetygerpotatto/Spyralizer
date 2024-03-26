@@ -38,6 +38,11 @@ void pendulum_vec::push_back(pendulum&& p) {
     }
 }
 
+void pendulum_vec::pop_back() {
+    pens[last_pen_idx--]  = 0;
+    --pen_count;
+}
+
 void pendulum_vec::rotate_pens() {
     for (size_t i = 0; i < size(); ++i) {
         pens[i].Rotate();
@@ -51,7 +56,7 @@ void pendulum_vec::increase_size() {
     }
     if (pen_count + 1 == capacity && capacity != 0) {
         capacity += 5;
-        pens = static_cast<pendulum*>(realloc(pens, capacity));
+        pens = new(pens) pendulum[capacity];
     }
 
 }
